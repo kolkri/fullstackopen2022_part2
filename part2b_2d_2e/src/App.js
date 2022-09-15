@@ -4,11 +4,27 @@ import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import contactService from './services/contacts'
 
+const Footer = () => {
+  const footerStyle = {
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 16
+  }
+
+  return (
+    <div style={footerStyle}>
+      <br />
+      <em>Contact app, Kristiina Kolu, 2022</em>
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
 
 
   useEffect(()=>{
@@ -36,12 +52,23 @@ const App = () => {
                 setPersons(persons.map(person => person.id !== personID ? person : data))
               })
               .catch(error => {
-                alert(`The contact of ${personToFind.name} was already deleted from server!`)
+                setErrorMessage(
+                  `Information of '${personToFind.name}' has already been removed from server`
+                )
+                setTimeout(() => {
+                  setErrorMessage(null)
+                }, 5000)
                 setPersons(persons.filter(p => p.id !== personID))
               })
           }
         } else {
           contactService.create(personObject).then(data => {
+            setErrorMessage(
+              `Added ${newName}`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
             setPersons(persons.concat(data))
             setNewName('')
             setNewNumber('')
@@ -59,11 +86,24 @@ const App = () => {
       }
   }
 
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+  
+    return (
+      <div className="error">
+        {message}
+      </div>
+    )
+  }
+
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={errorMessage} />
       <Filter filter={filter} setFilter={setFilter}/>
-      <h2>add a new</h2>
+      <h1>add a new</h1>
       <PersonForm 
         addName={addName} 
         newName={newName}
@@ -71,8 +111,9 @@ const App = () => {
         newNumber={newNumber}
         setNewNumber={setNewNumber}
         />
-      <h2>Numbers</h2>
+      <h1>Numbers</h1>
       <Persons persons={persons} filter={filter} deleteName={deleteName}/>
+      <Footer />
     </div>
   )
 

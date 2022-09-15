@@ -51,7 +51,6 @@ const App = () => {
         )
         setNotes(notes.filter(n => n.id !== id))
       })
-
   }
 
   
